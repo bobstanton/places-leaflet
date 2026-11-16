@@ -2,6 +2,8 @@
 
 Map provider for [Places](https://community.obsidian.md/plugins/places) using [Leaflet](https://leafletjs.com/), with raster maps, custom tile layers, markers, tracks, and overlays.
 
+This is not a stand-alone plugin, to use, install along side [Places](https://community.obsidian.md/plugins/places). Refer to the [sandbox](https://sandbox.obsidian.stanton.dev/places/) for examples.
+
 ## Network requests
 
 | Area           | Request                                                                                                      |

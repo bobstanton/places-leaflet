@@ -1,14 +1,8 @@
-/* Leaflet map container styles */
 .leaflet-map {
   width: 100%;
-  /* Height is set inline via JavaScript */
 }
 
-/* Marker and waypoint styles come from the places-shared public CSS exports. */
 
-/* ============================================================================
- * Leaflet-specific overrides for shared marker styles
- * ============================================================================ */
 
 .leaflet-marker-icon {
   display: flex;
@@ -17,29 +11,28 @@
   line-height: 1;
 }
 
-/* Leaflet label needs min-width for multi-line text wrapping */
 .leaflet-marker-icon-label {
   min-width: 80px;
 }
 
-/* Leaflet popup styles within Obsidian */
 .leaflet-popup-content {
   font-family: var(--font-interface);
   font-size: var(--font-ui-small);
   color: var(--text-normal);
 }
 
-.leaflet-popup-content .internal-link {
+.leaflet-popup-content .internal-link,
+.leaflet-popup-content .external-link {
   color: var(--link-color);
   text-decoration: var(--link-decoration);
 }
 
-.leaflet-popup-content .internal-link:hover {
+.leaflet-popup-content .internal-link:hover,
+.leaflet-popup-content .external-link:hover {
   color: var(--link-color-hover);
   text-decoration: var(--link-decoration-hover);
 }
 
-/* Critical fix to prevent Leaflet SVG path/polyline movement on zoom. */
 .places-map-container .leaflet-pane > svg,
 .places-map-container .leaflet-pane > canvas {
   width: auto;
@@ -60,9 +53,16 @@
   display: none;
 }
 
-/* ============================================================================
- * Cluster marker styles (native clustering implementation)
- * ============================================================================ */
+.places-waypoint-marker-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+}
+
 
 .places-cluster-marker {
   background: transparent;
@@ -88,10 +88,6 @@
   transform: scale(1.1);
 }
 
-/* ============================================================================
- * Leaflet-specific popup chrome overrides
- * (moved from places-shared/popup-styles.css)
- * ============================================================================ */
 
 .leaflet-popup {
   touch-action: pan-x pan-y pinch-zoom;
@@ -120,4 +116,13 @@
 
 .leaflet-popup-close-button {
   touch-action: manipulation;
+}
+
+.places-cluster-heatmap {
+  position: absolute;
+  pointer-events: none;
+}
+
+.places-cluster-heatmap-hidden {
+  display: none;
 }

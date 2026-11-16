@@ -1,6 +1,6 @@
 import { App, Plugin } from "obsidian";
 import { IPlaceExtensionSettings, IPlacesExtensionHostSettings } from "places-shared/settings";
-import { IPlacePluginExtension, IPlacePluginExtensionExports, registerPlaceExtensionLifecycle, PLACES_EXTENSION_API_VERSION, type ExtensionSettingsGroup } from "places-shared/services";
+import { IPlacePluginExtension, IPlacePluginExtensionExports, registerPlaceExtensionLifecycle, PLACES_EXTENSION_API_VERSION, type ExtensionSettingsGroup } from "places-shared/obsidian/services";
 import { scalarToString, Utilities, configureRequestLogging } from "places-shared/utils";
 import { LeafletMapBlockProcessor } from "./LeafletMapBlockProcessor";
 import { DEFAULT_LEAFLET_TILE_STYLE, LEAFLET_TILE_STYLES } from "./TileLayerStyles";
@@ -8,7 +8,6 @@ import "./styles.css";
 import "places-shared/error-styles.css";
 
 export default class LeafletPluginExtension extends Plugin implements IPlacePluginExtension {
-
   onload() {
     registerPlaceExtensionLifecycle(this);
   }
@@ -17,7 +16,8 @@ export default class LeafletPluginExtension extends Plugin implements IPlacePlug
     configureRequestLogging(mainSettings.developerMode);
     Utilities.applyDefaults(extensionSettings, DEFAULT_SETTINGS);
 
-    const mapBlockProcessor = new LeafletMapBlockProcessor(app, extensionSettings, mainSettings.units, mainSettings.developerMode);
+    const userAgent = `${this.manifest.id}/${this.manifest.version} (+${this.manifest.authorUrl ?? 'https://obsidian.md'})`;
+    const mapBlockProcessor = new LeafletMapBlockProcessor(app, extensionSettings, mainSettings.units, mainSettings.developerMode, userAgent);
 
     return {
       apiVersion: PLACES_EXTENSION_API_VERSION,
@@ -40,14 +40,16 @@ export default class LeafletPluginExtension extends Plugin implements IPlacePlug
   private settingsGroup(settings: IPlaceExtensionSettings): ExtensionSettingsGroup {
     return {
       heading: "Leaflet map",
+      displayValue: () => settings.defaultStyle === "custom" ? "Custom tiles" : (LEAFLET_TILE_STYLES[settings.defaultStyle]?.name ?? "OpenStreetMap"),
+      reloadOn: ["defaultStyle"],
       items: [
         {
           name: "Default map style",
-          desc: "Choose a predefined tile layer style or use custom settings below",
+          desc: "Predefined tile layer or custom tile settings.",
           control: {
             type: "dropdown",
             key: "defaultStyle",
-            options: Object.fromEntries(Object.entries(LEAFLET_TILE_STYLES).map(([key, style]) => [key, style.name])),
+            options: Object.fromEntries(Object.entries(LEAFLET_TILE_STYLES).map(([key, style]) => [key, style.requiresApiKey ? `${style.name} (API key required)` : style.name])),
           },
         },
         {
@@ -64,8 +66,9 @@ export default class LeafletPluginExtension extends Plugin implements IPlacePlug
       ],
       setValue: (key, value) => {
         const text = scalarToString(value);
+
         settings[key] = text;
-        // Choosing a predefined style also fills the custom tile fields it stands for.
+
         if (key === "defaultStyle" && text !== "custom" && LEAFLET_TILE_STYLES[text]) {
           settings.tileLayerUrl = LEAFLET_TILE_STYLES[text].url;
           settings.tileLayerAttribution = LEAFLET_TILE_STYLES[text].attribution;
@@ -74,7 +77,6 @@ export default class LeafletPluginExtension extends Plugin implements IPlacePlug
       updateOn: ["defaultStyle"],
     };
   }
-
 }
 
 const DEFAULT_SETTINGS: IPlaceExtensionSettings = {

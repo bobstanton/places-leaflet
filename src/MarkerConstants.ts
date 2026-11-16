@@ -35,12 +35,13 @@ export type MarkerBreakpoint = 'desktop' | 'tablet' | 'mobile';
 // Used by Leaflet's DivIcon iconAnchor option.
 export function getIconAnchor(breakpoint: MarkerBreakpoint = 'desktop'): [number, number] {
   const size = MarkerConstants[breakpoint].containerSize;
+
   return [size / 2, size / 2];
 }
 
 // Positions the popup above the icon.
 export function getPopupAnchor(breakpoint: MarkerBreakpoint = 'desktop'): [number, number] {
   const size = MarkerConstants[breakpoint].containerSize;
+
   return [0, -(size / 2)];
 }
-
